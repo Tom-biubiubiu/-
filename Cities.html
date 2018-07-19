@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<select id="sheng"></select>
+<select id="shi">
+    <option value="">市辖区</option>
+</select>
+<select id="qu">
+    <option value="">东城区</option>
+</select>
+<select id="zhen-jiedao">
+    <option value="">东华门街道</option>
+</select>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+    $.getJSON("Cities.json",function (res,status,xhr) {
+        var muni_area_beijing = muni_area_tianjin = muni_area_shanghai = [] //直辖市
+
+        for(var i=0;i<res.length;i++) {
+            if (res[i].name == '北京市') {
+                muni_area_beijing = []
+                for (var j = 0; j < res[i].childs.length; j++) {
+                    for (var k = 0; k < res[i].childs[j].childs.length; k++) {
+                        muni_area_beijing.push(res[i].childs[j].childs[k].name)
+                    }
+                }
+            } else if (res[i].name == '天津市') {
+                muni_area_tianjin = []
+                for (var j = 0; j < res[i].childs.length; j++) {
+                    for (var k = 0; k < res[i].childs[j].childs.length; k++) {
+                        muni_area_tianjin.push(res[i].childs[j].childs[k].name)
+                    }
+                }
+            } else if (res[i].name == '上海市') {
+                muni_area_shanghai = []
+                for (var j = 0; j < res[i].childs.length; j++) {
+                    for (var k = 0; k < res[i].childs[j].childs.length; k++) {
+                        muni_area_shanghai.push(res[i].childs[j].childs[k].name)
+                    }
+                }
+            }
+        }
+
+        //初始化显示
+        $(res).each(function (index,element) {
+            $("#sheng").append("<option>"+element.name
+                    +"</option>");
+            $(element.childs).each(function (i,v) {
+                if(this.code == 1101){
+                    for(var i=0;i<this.childs.length;i++){
+                        $("#qu").append("<option>"+ this.childs[i].name +"</option>")
+                    }
+                }
+                var area = '东城区'
+                $(v.childs).each(function () {
+                    if(this.name == area){
+                        for(var i=0;i<this.childs.length;i++){
+                            $('#zhen-jiedao').append('<option>'+this.childs[i].name+'</option>')
+                        }
+                    }
+                })
+            })
+
+        })
+
+        $("#sheng").change(function () {
+            var aa=$("#sheng").val();
+            var num = 1
+            $("#shi").children().remove();
+            $("#qu").children().remove();
+            $('#zhen-jiedao').children().remove()
+            $(res).each(function (index,element) {
+                $(element.childs).each(function (k,v) {
+                    if (element.name == aa) {
+                        $("#shi").append("<option>" + this.name
+
+                                + "</option>")
+                    }
+                    var bb=$("#shi").val();
+
+                    if(this.name == bb){
+                        $('#qu').children().remove()
+                        for(var i=0;i<this.childs.length;i++){
+                            $("#qu").append("<option>"+ this.childs[i].name +"</option>")
+                        }
+                    }
+                    if($("#sheng").val() == '北京市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_beijing.length;i++){
+                            $("#qu").append("<option>"+ muni_area_beijing[i] +"</option>")
+                        }
+                    }else if($("#sheng").val() == '天津市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_tianjin.length;i++){
+                            $("#qu").append("<option>"+ muni_area_tianjin[i] +"</option>")
+                        }
+                    }else if($("#sheng").val() == '上海市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_shanghai.length;i++){
+                            $("#qu").append("<option>"+ muni_area_shanghai[i] +"</option>")
+                        }
+                    }
+                    var cc = $('#qu').val(),
+                        areaNum1 = null
+
+                    for(var i=0;i<v.childs.length;i++){
+                        if(v.childs[i].name == cc && num == 1){ //num避免同区名，造成镇/街道多罗列
+                            areaNum1 = v.childs[i].childs.length
+                            for(var k=0;k<areaNum1;k++){
+                                $('#zhen-jiedao').append('<option>'+v.childs[i].childs[k].name+'</option>')
+                            }
+                            num++
+                        }
+                    }
+
+                })
+            })
+
+
+        })
+
+        $("#shi").change(function () {
+            var aa=$("#sheng").val();
+            var num = 1
+
+            $("#qu").children().remove();
+            $('#zhen-jiedao').children().remove()
+            $(res).each(function (index,element) {
+                $(element.childs).each(function (k,v) {
+
+                    var bb=$("#shi").val();
+
+                    if(this.name == bb){
+                        $('#qu').children().remove()
+                        for(var i=0;i<this.childs.length;i++){
+                            $("#qu").append("<option>"+ this.childs[i].name +"</option>")
+                        }
+                    }
+                    if($("#sheng").val() == '北京市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_beijing.length;i++){
+                            $("#qu").append("<option>"+ muni_area_beijing[i] +"</option>")
+                        }
+                    }else if($("#sheng").val() == '天津市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_tianjin.length;i++){
+                            $("#qu").append("<option>"+ muni_area_tianjin[i] +"</option>")
+                        }
+                    }else if($("#sheng").val() == '上海市'){
+                        $('#qu').children().remove()
+                        for(var i=0;i<muni_area_shanghai.length;i++){
+                            $("#qu").append("<option>"+ muni_area_shanghai[i] +"</option>")
+                        }
+                    }
+
+                    var cc = $('#qu').val(),
+                        areaNum1 = null
+
+                    for(var i=0;i<v.childs.length;i++){
+                        if(v.childs[i].name == cc && num == 1){
+                            areaNum1 = v.childs[i].childs.length
+                            for(var k=0;k<areaNum1;k++){
+                                $('#zhen-jiedao').append('<option>'+v.childs[i].childs[k].name+'</option>')
+                            }
+                            num++
+                        }
+                    }
+
+                })
+            })
+
+        })
+
+        $("#qu").change(function () {
+            var cc=$("#qu").val()
+            var num = 1
+            $("#zhen-jiedao").children().remove();
+            $(res).each(function (index,element) {
+                $(element.childs).each(function (k,v) {
+                    var areaNum1 = null
+                    for(var i=0;i<v.childs.length;i++){
+                        if(v.childs[i].name == cc && num == 1){
+                            areaNum1 = v.childs[i].childs.length
+                            for(var k=0;k<areaNum1;k++){
+                                $('#zhen-jiedao').append('<option>'+v.childs[i].childs[k].name+'</option>')
+                            }
+                            num++
+                        }
+                    }
+
+                })
+            })
+
+        })
+
+    })
+
+</script>
+</html>
